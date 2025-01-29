@@ -40,6 +40,10 @@ dependencies:
   get: ^4.6.6
   background_sms: ^0.0.4
   http: ^0.13.6
+  bluetooth_classic: ^0.0.2
+  percent_indicator: ^4.2.4
+  fl_chart: ^0.70.2
+  flutter_background_messenger: ^0.0.2
 
 dev_dependencies:
   flutter_test:
