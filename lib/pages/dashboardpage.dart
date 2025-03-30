@@ -9,6 +9,7 @@ import 'package:flutterwavepaymenttesting/pages/TokenPage.dart';
 import 'package:flutterwavepaymenttesting/pages/paymentpage.dart';
 import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/card.dart';
 import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/rwendobarchart.dart';
+import 'package:get/get.dart';
 
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -66,161 +67,193 @@ class _DashboardpageState extends State<Dashboardpage> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 230, 227, 227),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notification_add_outlined),
-          ),
-        ],
-      ),
-      drawer: Drawer(),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
-        child: Column(
-          children: [
-            SizedBox(
-              height: height * 0.01,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 0.02 * width,
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: IconButton(
-                    onPressed: () {
-                      sms.SendSms('45678238293892823');
-                    },
-                    icon: Icon(Icons.person),
-                  ),
-                  radius: width * 0.08,
-                ),
-                SizedBox(
-                  width: width * 0.1,
-                ),
-                const Text(
-                  'METER NO: 243000589737',
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 99, 97, 97),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic),
-                )
-              ],
-            ),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) return;
 
-            SizedBox(
-              height: height * 0.02,
-            ),
-            // this is the water balance container
-            Row(children: [
-              SizedBox(
-                width: width * 0.03,
+        final shouldExit = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Exit?'),
+            content: Text('Do you want to Exit'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text('yes'),
               ),
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  // color: const Color.fromARGB(255, 60, 129, 232),
-                  color: Colors.white,
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: Text('No'),
+              )
+            ],
+          ),
+        );
+        if (shouldExit == true) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 230, 227, 227),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.notification_add_outlined),
+            ),
+          ],
+        ),
+        drawer: Drawer(),
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
+          child: Column(
+            children: [
+              SizedBox(
+                height: height * 0.01,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 0.02 * width,
+                  ),
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: IconButton(
+                      onPressed: () {
+                        sms.SendSms('45678238293892823');
+                      },
+                      icon: Icon(Icons.person),
+                    ),
+                    radius: width * 0.08,
+                  ),
+                  SizedBox(
+                    width: width * 0.1,
+                  ),
+                  const Text(
+                    'METER NO: 243000589737',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 99, 97, 97),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic),
+                  )
+                ],
+              ),
+
+              SizedBox(
+                height: height * 0.02,
+              ),
+              // this is the water balance container
+              Row(children: [
+                SizedBox(
+                  width: width * 0.03,
                 ),
-                height: height * 0.12,
-                width: width * 0.93,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    // color: const Color.fromARGB(255, 60, 129, 232),
+                    color: Colors.white,
+                  ),
+                  height: height * 0.12,
+                  width: width * 0.93,
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Balance :',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Text(
+                          '2000 lts',
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.w300),
+                        ),
+                        CircularPercentIndicator(
+                          center: const Icon(
+                            Icons.water_drop_rounded,
+                            color: Colors.blue,
+                          ),
+                          radius: 40,
+                          lineWidth: 12,
+                          percent: 0.7,
+                          progressColor:
+                              const Color.fromARGB(255, 63, 113, 198),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dasboardcards(
+                    width: width,
+                    height: height,
+                    title: 'top UP',
+                    color: const Color.fromARGB(255, 60, 129, 232),
+                    Icon: Icon(Icons.arrow_upward),
+                    page: Paymentpage(),
+                  ),
+                  dasboardcards(
+                    page: Tokenpage(),
+                    width: width,
+                    height: height,
+                    title: " TOKEN ",
+                    color: Colors.lightBlue,
+                    Icon: Icon(Icons.edit_document),
+                  )
+                ],
+              ),
+              //history column
+              SizedBox(
+                height: height * 0.04,
+              ),
+
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white),
+                  height: height * 0.45,
+                  width: width * 0.9,
+                  child: ListView(
                     children: [
-                      const Text(
-                        'Balance :',
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Text(
-                        '2000 lts',
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.w300),
-                      ),
-                      CircularPercentIndicator(
-                        center: const Icon(
-                          Icons.water_drop_rounded,
-                          color: Colors.blue,
-                        ),
-                        radius: 40,
-                        lineWidth: 12,
-                        percent: 0.7,
-                        progressColor: const Color.fromARGB(255, 63, 113, 198),
-                      )
+                      ...barchartdata.map((e) {
+                        return Column(
+                          children: [
+                            Rwendobarchart(
+                                width: width,
+                                label: e['MON'].toString(),
+                                percent: e['value']),
+                            SizedBox(
+                              height: height * 0.015,
+                            )
+                          ],
+                        );
+                      }).toList(),
                     ],
                   ),
                 ),
               ),
-            ]),
-            SizedBox(
-              height: height * 0.02,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                dasboardcards(
-                  width: width,
-                  height: height,
-                  title: 'top UP',
-                  color: const Color.fromARGB(255, 60, 129, 232),
-                  Icon: Icon(Icons.arrow_upward),
-                  page: Paymentpage(),
-                ),
-                dasboardcards(
-                  page: Tokenpage(),
-                  width: width,
-                  height: height,
-                  title: " TOKEN ",
-                  color: Colors.lightBlue,
-                  Icon: Icon(Icons.edit_document),
-                )
-              ],
-            ),
-            //history column
-            SizedBox(
-              height: height * 0.04,
-            ),
-
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.white),
-                height: height * 0.45,
-                width: width * 0.9,
-                child: ListView(
-                  children: [
-                    ...barchartdata.map((e) {
-                      return Column(
-                        children: [
-                          Rwendobarchart(
-                              width: width,
-                              label: e['MON'].toString(),
-                              percent: e['value']),
-                          SizedBox(
-                            height: height * 0.015,
-                          )
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
