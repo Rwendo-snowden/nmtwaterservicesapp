@@ -33,9 +33,10 @@ class PaymentManipulation {
   handlePaymentInitialization() async {
     // final Customer customer = Customer(email: "customer@customer.com");
     final Customer customer = Customer(
-        name: "Tumaini Rweyendera",
-        phoneNumber: userPhoneNumber,
-        email: useremail);
+      name: "Tumaini Rweyendera",
+      phoneNumber: userPhoneNumber,
+      email: useremail,
+    );
 
     final Flutterwave flutterwave = Flutterwave(
         context: context,
@@ -68,6 +69,17 @@ class PaymentManipulation {
   }
 
 //
+
+// SEND TOKENS VIA BLUETOOTH
+
+  sendBlueTOKENS() async {
+    try {
+      await _bluetoothClassicPlugin.write("4575");
+    } catch (e) {
+      print(e);
+      print('Meter not connected');
+    }
+  }
 
   sendTokens() async {
     if (responseTxf == transactionRef && resposeSuccess == "true") {

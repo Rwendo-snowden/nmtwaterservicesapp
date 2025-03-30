@@ -32,17 +32,26 @@ class _PaymentpageState extends State<Paymentpage> {
 
   // void initState() {
   //   super.initState();
-  //   initPlatformState();
-  //   _bluetoothClassicPlugin.onDeviceStatusChanged().listen((event) {
-  //     setState(() {
-  //       _deviceStatus = event;
+  //   // initPlatformState();
+  //   try {
+  //     _bluetoothClassicPlugin.onDeviceStatusChanged().listen(
+  //       (event) {
+  //         setState(() {
+  //           _deviceStatus = event;
+  //           print('The event is :${event}');
+  //         });
+  //       },
+  //     );
+
+  //     _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
+  //       setState(() {
+  //         _data = Uint8List.fromList([..._data, ...event]);
+  //       });
   //     });
-  //   });
-  //   _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
-  //     setState(() {
-  //       _data = Uint8List.fromList([..._data, ...event]);
-  //     });
-  //   });
+  //   } catch (e) {
+  //     print(e);
+  //     print('This device is already intialized ');
+  //   }
   // }
 
   @override
@@ -51,7 +60,7 @@ class _PaymentpageState extends State<Paymentpage> {
         child: Scaffold(
       body: Column(
         children: [
-          // Text("Received data: ${String.fromCharCodes(_data)}"),
+          //   Text("Received data: ${String.fromCharCodes(_data)}"),
           // TextButton(
           //   onPressed: _deviceStatus == Device.connected
           //       ? () async {
@@ -66,8 +75,15 @@ class _PaymentpageState extends State<Paymentpage> {
           //       ? ElevatedButton(
           //           onPressed: () async {
           //             // the esp32  bluetooth (mac address) is :3C:71:BF:D5:0E:22
-          //             await _bluetoothClassicPlugin.connect("3C:71:BF:D5:0E:22",
-          //                 "00001101-0000-1000-8000-00805f9b34fb");
+          //             try {
+          //               await _bluetoothClassicPlugin.connect(
+          //                   "3C:71:BF:D5:0E:22",
+          //                   "00001101-0000-1000-8000-00805f9b34fb");
+          //             } catch (e) {
+          //               print(e);
+          //               print(
+          //                   'could not connect o device there is an execption occured');
+          //             }
           //           },
           //           child: Text('Connect to water Meter'),
           //         )
@@ -116,17 +132,27 @@ class _PaymentpageState extends State<Paymentpage> {
               ],
             ),
           ),
+          ElevatedButton(
+              onPressed: () {
+                PaymentManipulation Pay = PaymentManipulation(
+                    amount: _amount,
+                    context: context,
+                    userPhoneNumber: _mobileNumber,
+                    useremail: _useremail);
+// send via the bluetooth tokens
+                Pay.sendBlueTOKENS();
+              },
+              child: Text('Send bluetooth'))
         ],
       ),
     ));
   }
 
-  //
   // functions
   // Future<void> initPlatformState() async {
   //   String platformVersion;
-  //   // Platform messages may fail, so we use a try/catch PlatformException.
-  //   // We also handle the message potentially returning null.
+  //   //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   //   // We also handle the message potentially returning null.
   //   try {
   //     platformVersion = await _bluetoothClassicPlugin.getPlatformVersion() ??
   //         'Unknown platform version';
@@ -134,9 +160,9 @@ class _PaymentpageState extends State<Paymentpage> {
   //     platformVersion = 'Failed to get platform version.';
   //   }
 
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
+  //   //   // If the widget was removed from the tree while the asynchronous platform
+  //   //   // message was in flight, we want to discard the reply rather than calling
+  //   //   // setState to update our non-existent appearance.
   //   if (!mounted) return;
 
   //   setState(() {

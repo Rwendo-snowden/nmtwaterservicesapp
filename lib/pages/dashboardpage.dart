@@ -21,29 +21,6 @@ class Dashboardpage extends StatefulWidget {
 }
 
 class _DashboardpageState extends State<Dashboardpage> {
-  // String platformVersions = 'Unknown';
-  // final bluetoothClassicPlugin = BluetoothClassic();
-  // List<Device> devices = [];
-  // List<Device> discoveredDevices = [];
-
-  // int deviceStatus = Device.disconnected;
-  // Uint8List _data = Uint8List(0);
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   initPlatformState();
-  //   bluetoothClassicPlugin.onDeviceStatusChanged().listen((event) {
-  //     setState(() {
-  //       deviceStatus = event;
-  //     });
-  //   });
-  //   bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
-  //     setState(() {
-  //       _data = Uint8List.fromList([..._data, ...event]);
-  //     });
-  //   });
-  // }
-
   // this the list of my barcharts data
   List barchartdata = [
     {'MON': 'JAN', 'value': 0.3},
@@ -62,6 +39,37 @@ class _DashboardpageState extends State<Dashboardpage> {
 
   // create an instance of sms controller
   final Smscontroller sms = Smscontroller();
+
+// bluetooth intialization here !!
+
+  var _deviceStatus = Device.disconnected;
+  final _bluetoothClassicPlugin = BluetoothClassic();
+  Uint8List _data = Uint8List(0);
+  String _platformVersion = 'Unknown';
+
+  void initState() {
+    super.initState();
+    // initPlatformState();
+    try {
+      _bluetoothClassicPlugin.onDeviceStatusChanged().listen(
+        (event) {
+          setState(() {
+            _deviceStatus = event;
+            print('The event is :${event}');
+          });
+        },
+      );
+
+      _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
+        setState(() {
+          _data = Uint8List.fromList([..._data, ...event]);
+        });
+      });
+    } catch (e) {
+      print(e);
+      print('This device is already intialized ');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +110,26 @@ class _DashboardpageState extends State<Dashboardpage> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           actions: [
+            _deviceStatus == Device.disconnected
+                ? IconButton(
+                    onPressed: () async {
+                      try {
+                        await _bluetoothClassicPlugin.connect(
+                            "3C:71:BF:D5:0E:22",
+                            "00001101-0000-1000-8000-00805f9b34fb");
+                      } catch (e) {
+                        print(e);
+                        print(
+                            'could not connect o device there is an execption occured');
+                      }
+                    },
+                    icon: Icon(Icons.bluetooth_disabled),
+                  )
+                : IconButton(
+                    onPressed: () async {
+                      await _bluetoothClassicPlugin.disconnect();
+                    },
+                    icon: Icon(Icons.bluetooth_connected_rounded)),
             IconButton(
               onPressed: () {},
               icon: Icon(Icons.notification_add_outlined),
@@ -184,7 +212,7 @@ class _DashboardpageState extends State<Dashboardpage> {
                             Icons.water_drop_rounded,
                             color: Colors.blue,
                           ),
-                          radius: 40,
+                          radius: width * 0.095,
                           lineWidth: 12,
                           percent: 0.7,
                           progressColor:
@@ -257,5 +285,27 @@ class _DashboardpageState extends State<Dashboardpage> {
         ),
       ),
     );
+  }
+
+  // functions
+  Future<void> initPlatformState() async {
+    String platformVersion;
+    //   // Platform messages may fail, so we use a try/catch PlatformException.
+    //   // We also handle the message potentially returning null.
+    try {
+      platformVersion = await _bluetoothClassicPlugin.getPlatformVersion() ??
+          'Unknown platform version';
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    //   // If the widget was removed from the tree while the asynchronous platform
+    //   // message was in flight, we want to discard the reply rather than calling
+    //   // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _platformVersion = platformVersion;
+    });
   }
 }
