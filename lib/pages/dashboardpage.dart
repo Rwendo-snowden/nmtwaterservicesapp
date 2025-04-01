@@ -127,7 +127,11 @@ class _DashboardpageState extends State<Dashboardpage> {
                   )
                 : IconButton(
                     onPressed: () async {
-                      await _bluetoothClassicPlugin.disconnect();
+                      try {
+                        await _bluetoothClassicPlugin.disconnect();
+                      } catch (e) {
+                        print("Meter couldn't disconnect please try again");
+                      }
                     },
                     icon: Icon(Icons.bluetooth_connected_rounded)),
             IconButton(

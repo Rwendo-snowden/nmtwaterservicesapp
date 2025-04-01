@@ -26,6 +26,7 @@ class PaymentManipulation {
 
   // intilizing bluetooth conections
   final _bluetoothClassicPlugin = BluetoothClassic();
+  final deviceStatus = Device.connected;
   // payment handling by flutterwave
   var responseTxf = '';
   var resposeSuccess = '';
@@ -74,7 +75,7 @@ class PaymentManipulation {
 
   sendBlueTOKENS() async {
     try {
-      await _bluetoothClassicPlugin.write("4575");
+      await _bluetoothClassicPlugin.write("sent via bluetooth 4575");
     } catch (e) {
       print(e);
       print('Meter not connected');
@@ -84,11 +85,12 @@ class PaymentManipulation {
   sendTokens() async {
     if (responseTxf == transactionRef && resposeSuccess == "true") {
       // then check for bluetooth connetion if available
-
-      //   await _bluetoothClassicPlugin.write("4575");
-
-      // send the tokens to the meters mobile number
-      sms.SendSms('token is:U60645U6U04');
+      if (deviceStatus == 2) {
+        sendBlueTOKENS();
+      } else {
+        // send the tokens to the meters mobile number
+        sms.SendSms('token is:U60645U6U04');
+      }
     }
   }
 //

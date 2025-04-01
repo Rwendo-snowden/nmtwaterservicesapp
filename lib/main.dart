@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterwavepaymenttesting/pages/dashboardpage.dart';
+import 'package:flutterwavepaymenttesting/pages/paymentpage.dart';
 
 import 'package:get/get.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'NMT water services ',
       // home: MyHomePage('Flutterwave Standard'),
-      // home: Paymentpage(),
+      //home: Paymentpage(),
       //home: Tokenpage(),
       home: Dashboardpage(),
     );
