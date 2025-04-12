@@ -4,6 +4,9 @@ import 'package:bluetooth_classic/bluetooth_classic.dart';
 import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
+import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
+import 'package:get/get.dart';
 
 class Tokenpage extends StatefulWidget {
   const Tokenpage({super.key});
@@ -16,12 +19,15 @@ class _TokenpageState extends State<Tokenpage> {
   final _Tokenformkey = GlobalKey<FormState>();
   var Token = '';
   //
+  final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
   final _bluetoothClassicPlugin = BluetoothClassic();
   //
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return
+        //safe Area
+        Scaffold(
+      appBar: NMTAPPBAR(bluetoothservices: bluetoothservices),
       body: Column(
         children: [
           //
@@ -34,7 +40,7 @@ class _TokenpageState extends State<Tokenpage> {
                   maxLength: 20,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return " Tafadhali weka TOKEn  ";
+                      return " Tafadhali weka TOKEN  ";
                     }
                     return null;
                   },
@@ -66,7 +72,7 @@ class _TokenpageState extends State<Tokenpage> {
           ),
         ],
       ),
-    ));
+    );
   }
 
 //

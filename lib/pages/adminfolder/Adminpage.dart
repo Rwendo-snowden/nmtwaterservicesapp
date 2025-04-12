@@ -1,60 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
-
-import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
 import 'package:flutterwavepaymenttesting/pages/TokenPage.dart';
-import 'package:flutterwavepaymenttesting/pages/paymentpage.dart';
-import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
-import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/card.dart';
-import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/rwendobarchart.dart';
-import 'package:get/get.dart';
+import 'package:flutterwavepaymenttesting/pages/adminfolder/userRegistrationpage.dart';
 
+import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/card.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class Dashboardpage extends StatefulWidget {
-  const Dashboardpage({super.key});
+class AdminDashboard extends StatefulWidget {
+  const AdminDashboard({super.key});
 
   @override
-  State<Dashboardpage> createState() => _DashboardpageState();
+  State<AdminDashboard> createState() => _AdminDashboardState();
 }
 
-class _DashboardpageState extends State<Dashboardpage> {
-  // this the list of my barcharts data
-  List barchartdata = [
-    {'MON': 'JAN', 'value': 0.3},
-    {'MON': 'FEB', 'value': 0.7},
-    {'MON': 'MAR', 'value': 0.4},
-    {'MON': 'APR', 'value': 0.6},
-    {'MON': 'MAY', 'value': 0.8},
-    {'MON': 'JUN', 'value': 0.9},
-    {'MON': 'JUL', 'value': 0.48},
-    {'MON': 'AUG', 'value': 0.46},
-    {'MON': 'SEP', 'value': 0.55},
-    {'MON': 'OCT', 'value': 0.4},
-    {'MON': 'NOV', 'value': 0.9},
-    {'MON': 'DEC', 'value': 0.6},
-  ];
-
-  // create an instance of sms controller
-  final Smscontroller sms = Smscontroller();
-
-// bluetooth intialization here !!
-
-  // var _deviceStatus = Device.disconnected;
-
-  // final _bluetoothClassicPlugin = BluetoothClassic();
-  // Uint8List _data = Uint8List(0);
-  // String _platformVersion = 'Unknown';
-
-  //
-  final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
-
-  void initState() {
-    super.initState();
-    bluetoothservices.BLinitialstate();
-  }
-
+class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -67,20 +26,20 @@ class _DashboardpageState extends State<Dashboardpage> {
         final shouldExit = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Exit?'),
-            content: Text('Do you want to Exit'),
+            title: const Text('Exit?'),
+            content: const Text('Do you want to Exit'),
             actions: [
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
-                child: Text('yes'),
+                child: const Text('yes'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(false);
                 },
-                child: Text('No'),
+                child: const Text('No'),
               )
             ],
           ),
@@ -91,10 +50,10 @@ class _DashboardpageState extends State<Dashboardpage> {
       },
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 230, 227, 227),
-        appBar: NMTAPPBAR(bluetoothservices: bluetoothservices),
-        drawer: Drawer(),
+        appBar: AppBar(),
+        drawer: const Drawer(),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 12),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
           child: Column(
             children: [
               SizedBox(
@@ -107,13 +66,11 @@ class _DashboardpageState extends State<Dashboardpage> {
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.white,
-                    child: IconButton(
-                      onPressed: () {
-                        sms.SendSms('45678238293892823');
-                      },
-                      icon: Icon(Icons.person),
-                    ),
                     radius: width * 0.08,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.person),
+                    ),
                   ),
                   SizedBox(
                     width: width * 0.1,
@@ -152,7 +109,7 @@ class _DashboardpageState extends State<Dashboardpage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Balance :',
+                          'Usage :',
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
@@ -188,48 +145,72 @@ class _DashboardpageState extends State<Dashboardpage> {
                   dasboardcards(
                     width: width,
                     height: height,
-                    title: 'top UP',
+                    title: 'Register',
                     color: const Color.fromARGB(255, 60, 129, 232),
-                    Icon: Icon(Icons.arrow_upward),
-                    page: Paymentpage(),
+                    Icon: const Icon(Icons.person),
+                    page: RegistrationPage(),
                   ),
                   dasboardcards(
-                    page: Tokenpage(),
+                    page: const Tokenpage(),
                     width: width,
                     height: height,
-                    title: " TOKEN ",
+                    title: " Payments ",
                     color: Colors.lightBlue,
-                    Icon: Icon(Icons.edit_document),
+                    Icon: const Icon(Icons.money),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dasboardcards(
+                    page: const Tokenpage(),
+                    width: width,
+                    height: height,
+                    title: " Manage ",
+                    color: Colors.amber,
+                    Icon: const Icon(Icons.manage_accounts),
+                  ),
+                  dasboardcards(
+                    page: const Tokenpage(),
+                    width: width,
+                    height: height,
+                    title: " Settings ",
+                    color: Colors.green,
+                    Icon: const Icon(Icons.settings),
+                  )
+                ],
+              ),
+              SizedBox(
+                height: height * 0.02,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  dasboardcards(
+                    page: const Tokenpage(),
+                    width: width,
+                    height: height,
+                    title: " Manage house ",
+                    color: Colors.black26,
+                    Icon: const Icon(Icons.apartment),
+                  ),
+                  dasboardcards(
+                    page: const Tokenpage(),
+                    width: width,
+                    height: height,
+                    title: " App Settings ",
+                    color: Colors.pinkAccent,
+                    Icon: const Icon(Icons.settings_system_daydream),
                   )
                 ],
               ),
               //history column
               SizedBox(
                 height: height * 0.04,
-              ),
-
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.white),
-                  height: height * 0.45,
-                  width: width * 0.9,
-                  child: ListView(
-                    children: [
-                      ...barchartdata.map((e) {
-                        return Rwendobarchart(
-                          width: width,
-                          label: e['MON'].toString(),
-                          percent: e['value'],
-                          height: height,
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),

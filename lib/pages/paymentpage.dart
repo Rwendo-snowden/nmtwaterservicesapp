@@ -1,9 +1,11 @@
-import 'package:bluetooth_classic/bluetooth_classic.dart';
-import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/paymentmanipulations.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
+import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
+import 'package:flutterwavepaymenttesting/wigdets/paymentpagewidgets/statementbox.dart';
+import 'package:get/get.dart';
 
 class Paymentpage extends StatefulWidget {
   const Paymentpage({super.key});
@@ -24,94 +26,64 @@ class _PaymentpageState extends State<Paymentpage> {
   //intiialize sms controller
 
   final Smscontroller sms = Smscontroller();
-
-  // var _deviceStatus = Device.disconnected;
-  // final _bluetoothClassicPlugin = BluetoothClassic();
-  // Uint8List _data = Uint8List(0);
-  // String _platformVersion = 'Unknown';
-
-  // void initState() {
-  //   super.initState();
-  //   // initPlatformState();
-  //   try {
-  //     _bluetoothClassicPlugin.onDeviceStatusChanged().listen(
-  //       (event) {
-  //         setState(() {
-  //           _deviceStatus = event;
-  //           print('The event is :${event}');
-  //         });
-  //       },
-  //     );
-
-  //     _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
-  //       setState(() {
-  //         _data = Uint8List.fromList([..._data, ...event]);
-  //       });
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //     print('This device is already intialized ');
-  //   }
-  // }
-
+//
+  final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    //phone dimensions
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 235, 228, 228),
+      appBar: NMTAPPBAR(bluetoothservices: bluetoothservices),
+      // appBar: AppBar(
+      //   backgroundColor: const Color.fromARGB(255, 235, 228, 228),
+      //   toolbarHeight: height * 0.1,
+      //   leading: IconButton(
+      //       onPressed: () {},
+      //       icon: Icon(
+      //         Icons.arrow_back_ios_new_sharp,
+      //       )),
+      // ),
       body: Column(
         children: [
-          //   Text("Received data: ${String.fromCharCodes(_data)}"),
-          // TextButton(
-          //   onPressed: _deviceStatus == Device.connected
-          //       ? () async {
-          //           await _bluetoothClassicPlugin.disconnect();
-          //         }
-          //       : null,
-          //   child: const Text("disconnect"),
-          // ),
-          // Container(
-          //   child: _deviceStatus ==
-          //           Device.disconnected // checking for the bluetooth status
-          //       ? ElevatedButton(
-          //           onPressed: () async {
-          //             // the esp32  bluetooth (mac address) is :3C:71:BF:D5:0E:22
-          //             try {
-          //               await _bluetoothClassicPlugin.connect(
-          //                   "3C:71:BF:D5:0E:22",
-          //                   "00001101-0000-1000-8000-00805f9b34fb");
-          //             } catch (e) {
-          //               print(e);
-          //               print(
-          //                   'could not connect o device there is an execption occured');
-          //             }
-          //           },
-          //           child: Text('Connect to water Meter'),
-          //         )
-          //       : Text('you are connected to meter'),
-          // ),
+          SizedBox(
+            height: height * 0.01,
+          ),
           Form(
             key: _Paymentformkey,
             child: Column(
               children: <Widget>[
-                TextFormField(
-                  keyboardType: TextInputType.number,
-                  maxLength: 20,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return " Tafadhali weka kiasi  ";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _amount = value!;
-                  },
-                  decoration: const InputDecoration(
-                    label: Text('amount'),
+                Center(
+                  child: SizedBox(
+                    width: width * 0.9,
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      maxLines: 2,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return " please insert amount  ";
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _amount = value!;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "e.g 10000",
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(width: 0.7),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                FilledButton(
-                  onPressed: () {
-                    //sms.SendSms('yool');
+
+                // pay customized button
+                InkWell(
+                  onTap: () {
                     if (_Paymentformkey.currentState!.validate()) {
                       _Paymentformkey.currentState!.save();
                       // after saving  the amount data then call the following funtion
@@ -124,49 +96,103 @@ class _PaymentpageState extends State<Paymentpage> {
                       // calling the manipulation value
                       Pay.handlePaymentInitialization();
                     }
-
-                    // then call the payment handling function
                   },
-                  child: const Text('pay'),
-                ),
+                  child: Container(
+                    height: height * 0.06,
+                    width: width * 0.9,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          spreadRadius: 3,
+                          offset: const Offset(5, 5),
+                        ),
+                      ],
+                      color: Colors.green,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Pay',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
           ),
-          ElevatedButton(
-              onPressed: () {
-                PaymentManipulation Pay = PaymentManipulation(
-                    amount: _amount,
-                    context: context,
-                    userPhoneNumber: _mobileNumber,
-                    useremail: _useremail);
-// send via the bluetooth tokens
-                Pay.sendBlueTOKENS();
-              },
-              child: Text('Send bluetooth'))
+//           ElevatedButton(
+//               onPressed: () {
+//                 PaymentManipulation Pay = PaymentManipulation(
+//                     amount: _amount,
+//                     context: context,
+//                     userPhoneNumber: _mobileNumber,
+//                     useremail: _useremail);
+// // send via the bluetooth tokens
+//                 Pay.sendBlueTOKENS();
+//               },
+//               child: Text('Send bluetooth')),
+
+          SizedBox(
+            height: height * 0.05,
+          ),
+
+          Expanded(
+            child: Container(
+              width: width * 0.9,
+              height: height * 0.6,
+              decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(12.0)),
+              child: Column(
+                children: [
+                  Container(
+                    height: height * 0.06,
+                    width: width * 0.9,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      border: Border(bottom: BorderSide()),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: width * 0.04,
+                        ),
+                        const Text(
+                          'Statement',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(
+                          width: width * 0.55,
+                        ),
+                        const Icon(Icons.checklist)
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: 3,
+                      itemBuilder: (BuildContext context, int index) {
+                        return statementBox(height: height, width: width);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
-    ));
+    );
   }
-
-  // functions
-  // Future<void> initPlatformState() async {
-  //   String platformVersion;
-  //   //   // Platform messages may fail, so we use a try/catch PlatformException.
-  //   //   // We also handle the message potentially returning null.
-  //   try {
-  //     platformVersion = await _bluetoothClassicPlugin.getPlatformVersion() ??
-  //         'Unknown platform version';
-  //   } on PlatformException {
-  //     platformVersion = 'Failed to get platform version.';
-  //   }
-
-  //   //   // If the widget was removed from the tree while the asynchronous platform
-  //   //   // message was in flight, we want to discard the reply rather than calling
-  //   //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-
-  //   setState(() {
-  //     _platformVersion = platformVersion;
-  //   });
-  // }
 }

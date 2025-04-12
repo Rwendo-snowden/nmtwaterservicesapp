@@ -47,6 +47,7 @@ dependencies:
   flutter_background_messenger: ^0.0.2
   firebase_core: ^3.13.0
   firebase_database: ^11.3.5
+  azampay: ^0.0.1
 
 dev_dependencies:
   flutter_test:
