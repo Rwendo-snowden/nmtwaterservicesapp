@@ -5,10 +5,18 @@ class statementBox extends StatelessWidget {
     super.key,
     required this.height,
     required this.width,
+    required this.amount,
+    required this.date,
+    required this.liters,
+    required this.tokens,
   });
 
   final double height;
   final double width;
+  final amount;
+  final date;
+  final liters;
+  final tokens;
 
   @override
   Widget build(BuildContext context) {
@@ -23,24 +31,30 @@ class statementBox extends StatelessWidget {
               decoration: const BoxDecoration(
                 color: Colors.white,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    '10,000/=',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '1000 lts',
+                    date,
                     style: TextStyle(
-                        fontSize: 18, overflow: TextOverflow.ellipsis),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.clip),
                   ),
-                  Text(
-                    '2/2/2202',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
+                  // Text(
+                  //   liters,
+                  //   style: TextStyle(
+                  //     fontSize: 18,
+                  //     overflow: TextOverflow.clip,
+                  //   ),
+                  //  ),
+                  // Text(
+                  //   date,
+                  //   style: TextStyle(
+                  //     fontSize: 18,
+                  //     overflow: TextOverflow.clip,
+                  //   ),
+                  // ),
                 ],
               ),
             ),

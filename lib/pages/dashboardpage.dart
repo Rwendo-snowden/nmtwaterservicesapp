@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterwavepaymenttesting/Databases/Dbcontrollers/LocalDatabase.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
 
 import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/tokenmanipulation.dart';
 import 'package:flutterwavepaymenttesting/pages/TokenPage.dart';
 import 'package:flutterwavepaymenttesting/pages/paymentpage.dart';
 import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
@@ -11,6 +13,7 @@ import 'package:flutterwavepaymenttesting/wigdets/dashboardwidgets/rwendobarchar
 import 'package:get/get.dart';
 
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboardpage extends StatefulWidget {
   const Dashboardpage({super.key});
@@ -41,18 +44,45 @@ class _DashboardpageState extends State<Dashboardpage> {
 
 // bluetooth intialization here !!
 
-  // var _deviceStatus = Device.disconnected;
-
-  // final _bluetoothClassicPlugin = BluetoothClassic();
-  // Uint8List _data = Uint8List(0);
-  // String _platformVersion = 'Unknown';
-
   //
   final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
 
+  // payment local db intialization
+  final DbController localDb = Get.put(DbController());
+
+  //
+  final Tokenmanipulation mn = Tokenmanipulation();
+  //
+  //taking data from shared preferences
+  String meterNumber = '';
+  String Email = '';
+  String Pnumber = '';
+  String Uname = '';
+  @override
   void initState() {
     super.initState();
-    bluetoothservices.BLinitialstate();
+    _loadUserSession(); // call the async method without awaiting
+  }
+
+  void _loadUserSession() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? username = prefs.getString('username');
+    String? meterNo = prefs.getString('Meter_NO');
+    String? Phonenumber = prefs.getString('Phonenumber');
+    String? email = prefs.getString('email');
+
+    setState(() {
+      meterNumber = meterNo ?? 'Unknown'; // or default fallback
+      Pnumber = Phonenumber.toString();
+      Email = email.toString();
+      Uname = username.toString();
+    });
+
+    if (username != null) {
+      print('Logged in user: $username');
+      // Optionally do more with the username
+    }
   }
 
   @override
@@ -107,19 +137,25 @@ class _DashboardpageState extends State<Dashboardpage> {
                   ),
                   CircleAvatar(
                     backgroundColor: Colors.white,
+                    radius: width * 0.08,
                     child: IconButton(
-                      onPressed: () {
-                        sms.SendSms('45678238293892823');
+                      onPressed: () async {
+                        //  sms.SendSms('45678238293892823');
+
+                        // var tk = await mn.CreateToken(1000);
+                        // print('the tk is :$tk');
                       },
                       icon: Icon(Icons.person),
                     ),
-                    radius: width * 0.08,
                   ),
                   SizedBox(
                     width: width * 0.1,
                   ),
-                  const Text(
-                    'METER NO: 243000589737',
+                  Text(
+                    //'METER NO: 243000589737',ME
+                    // 'METER NO: 246000589738',DEUS
+                    'METER NO: $meterNumber',
+
                     style: TextStyle(
                         color: Color.fromARGB(255, 99, 97, 97),
                         fontSize: 20,
@@ -191,7 +227,12 @@ class _DashboardpageState extends State<Dashboardpage> {
                     title: 'top UP',
                     color: const Color.fromARGB(255, 60, 129, 232),
                     Icon: Icon(Icons.arrow_upward),
-                    page: Paymentpage(),
+                    page: Paymentpage(
+                      mobilenumber: Pnumber,
+                      useremail: Email,
+                      username: Uname,
+                      meterno: meterNumber,
+                    ),
                   ),
                   dasboardcards(
                     page: Tokenpage(),

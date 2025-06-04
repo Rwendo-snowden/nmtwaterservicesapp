@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1013626246346",
+    "firebase_url": "https://iot-41c94-default-rtdb.firebaseio.com",
+    "project_id": "iot-41c94",
+    "storage_bucket": "iot-41c94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013626246346:android:2c032a74fd01f1fec45033",
+        "android_client_info": {
+          "package_name": "com.apa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0uONciv_bZFnL_50w-eWZV6k5ZVdJEQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013626246346:android:7e069a7381377fbdc45033",
+        "android_client_info": {
+          "package_name": "com.example.flutterwavepaymenttesting"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0uONciv_bZFnL_50w-eWZV6k5ZVdJEQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013626246346:android:98a53f01de6570b5c45033",
+        "android_client_info": {
+          "package_name": "com.rwendoiot.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0uONciv_bZFnL_50w-eWZV6k5ZVdJEQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

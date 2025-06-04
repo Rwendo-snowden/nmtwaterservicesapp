@@ -16,38 +16,39 @@ class NMTAPPBAR extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Colors.white,
       actions: [
-        GetBuilder<Bluetoothservices>(
-          init: Bluetoothservices(),
-          initState: (_) {},
-          builder: (_) {
-            return Row(
-              children: [
-                //  _deviceStatus == Device.disconnected
-                bluetoothservices.deviceStatus == Device.disconnected
-                    ? IconButton(
-                        onPressed: () async {
-                          bluetoothservices.BLconnection();
-                        },
-                        icon: Icon(Icons.bluetooth_disabled),
-                      )
-                    : //_deviceStatus == Device.connecting
-                    bluetoothservices.deviceStatus == Device.connecting
-                        ? IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.bluetooth_searching_rounded))
-                        : IconButton(
-                            onPressed: () async {
-                              bluetoothservices.BLdisconnetion();
-                            },
-                            icon: Icon(Icons.bluetooth_connected_rounded)),
-              ],
-            );
-          },
-        ),
+        // GetBuilder<Bluetoothservices>(
+        //   init: Bluetoothservices(),
+        //   initState: (_) {},
+        //   builder: (_) {
+        //     // return Row(
+        //     //   children: [
+        //     //     //  _deviceStatus == Device.disconnected
+        //     //     bluetoothservices.deviceStatus == Device.disconnected
+        //     //         ? IconButton(
+        //     //             onPressed: () async {
+        //     //               bluetoothservices.BLconnection();
+        //     //             },
+        //     //             icon: Icon(Icons.bluetooth_disabled),
+        //     //           )
+        //     //         : //_deviceStatus == Device.connecting
+        //     //         bluetoothservices.deviceStatus == Device.connecting
+        //     //             ? IconButton(
+        //     //                 onPressed: () {},
+        //     //                 icon: Icon(Icons.bluetooth_searching_rounded))
+        //     //             : IconButton(
+        //     //                 onPressed: () async {
+        //     //                   bluetoothservices.BLdisconnetion();
+        //     //                 },
+        //     //                 icon: Icon(Icons.bluetooth_connected_rounded)),
+        //     //   ],
+        //     // );
+        //   },
+        // ),
         IconButton(
           onPressed: () {},
           icon: Icon(Icons.notification_add_outlined),
         ),
+        IconButton(onPressed: () {}, icon: Icon(Icons.logout)),
       ],
     );
   }

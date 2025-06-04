@@ -1,14 +1,29 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterwavepaymenttesting/Databases/Dbcontrollers/LocalDatabase.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/paymentmanipulations.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
 import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
+import 'package:flutterwavepaymenttesting/wigdets/buttonUpdates.dart';
 import 'package:flutterwavepaymenttesting/wigdets/paymentpagewidgets/statementbox.dart';
 import 'package:get/get.dart';
 
 class Paymentpage extends StatefulWidget {
-  const Paymentpage({super.key});
+  final username;
+  final mobilenumber;
+  final useremail;
+  final meterno;
+
+  const Paymentpage({
+    super.key,
+    required this.mobilenumber,
+    required this.useremail,
+    required this.username,
+    required this.meterno,
+  });
 
   @override
   State<Paymentpage> createState() => _PaymentpageState();
@@ -18,8 +33,10 @@ class _PaymentpageState extends State<Paymentpage> {
   final _Paymentformkey = GlobalKey<FormState>();
 
   String _amount = '';
-  final _mobileNumber = "0613311958";
-  final _useremail = "emmanuelrweyendera@gmail.com";
+  // final _mobileNumber = "0622000051";
+  // final _useremail = "emmanuelrweyendera@gmail.com";
+  //final _useremail = "deuszacharia596@gmail.com";
+  //final _useremail = "allysonsanga97@gmail.com";
   final currency = "TZS";
   bool isTestmode = true;
 
@@ -28,11 +45,23 @@ class _PaymentpageState extends State<Paymentpage> {
   final Smscontroller sms = Smscontroller();
 //
   final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
+
+  // payment button status
+  // var paybuttonstatus = 'Pay';
+  final Buttonupdates paybuttonstatus = Get.put(Buttonupdates());
+
+  //create an instance of local database
+  final DbController localDb = Get.put(DbController());
+
   @override
   Widget build(BuildContext context) {
     //phone dimensions
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+
+    // the fetched data from database
+    List fetchedPayments = localDb.paymentData;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 235, 228, 228),
       appBar: NMTAPPBAR(bluetoothservices: bluetoothservices),
@@ -82,46 +111,72 @@ class _PaymentpageState extends State<Paymentpage> {
                 ),
 
                 // pay customized button
-                InkWell(
-                  onTap: () {
-                    if (_Paymentformkey.currentState!.validate()) {
-                      _Paymentformkey.currentState!.save();
-                      // after saving  the amount data then call the following funtion
-                      // create an instance for the paymentManipulation
-                      PaymentManipulation Pay = PaymentManipulation(
-                          amount: _amount,
-                          context: context,
-                          userPhoneNumber: _mobileNumber,
-                          useremail: _useremail);
-                      // calling the manipulation value
-                      Pay.handlePaymentInitialization();
-                    }
-                  },
-                  child: Container(
-                    height: height * 0.06,
-                    width: width * 0.9,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                          spreadRadius: 3,
-                          offset: const Offset(5, 5),
+                GetBuilder<Buttonupdates>(
+                  init: Buttonupdates(),
+                  initState: (_) {},
+                  builder: (_) {
+                    return InkWell(
+                      onTap: () {
+                        if (_Paymentformkey.currentState!.validate()) {
+                          _Paymentformkey.currentState!.save();
+                          // after saving  the amount data then call the following funtion
+                          // create an instance for the paymentManipulation
+                          PaymentManipulation Pay = PaymentManipulation(
+                            amount: _amount,
+                            context: context,
+                            userPhoneNumber: widget.mobilenumber,
+                            useremail: widget.useremail,
+                            username: widget.username,
+                            meterNo: widget.meterno,
+                          );
+                          // calling the manipulation value
+                          paybuttonstatus.updateButton();
+                          Pay.handlePaymentInitialization();
+                        }
+                      },
+                      child: Container(
+                        height: height * 0.06,
+                        width: width * 0.9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 10,
+                              spreadRadius: 3,
+                              offset: const Offset(5, 5),
+                            ),
+                          ],
+                          color: Colors.green,
                         ),
-                      ],
-                      color: Colors.green,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Pay',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
+                        child: paybuttonstatus.buttonStatus == 'Pay'
+                            ? Center(
+                                child: Text(
+                                  "${paybuttonstatus.buttonStatus} ",
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                    Text(
+                                      "${paybuttonstatus.buttonStatus} ",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ]),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 )
               ],
             ),
@@ -138,6 +193,13 @@ class _PaymentpageState extends State<Paymentpage> {
 //               },
 //               child: Text('Send bluetooth')),
 
+          // ElevatedButton(
+          //   onPressed: () {
+          //     localDb.DeleteAllPayments();
+          //   },
+          //   child: Text('Delete all'),
+          // ),
+
           SizedBox(
             height: height * 0.05,
           ),
@@ -145,7 +207,7 @@ class _PaymentpageState extends State<Paymentpage> {
           Expanded(
             child: Container(
               width: width * 0.9,
-              height: height * 0.6,
+              // height: height * 0.6,
               decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(12.0)),
@@ -180,13 +242,34 @@ class _PaymentpageState extends State<Paymentpage> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: 3,
-                      itemBuilder: (BuildContext context, int index) {
-                        return statementBox(height: height, width: width);
+                    child: GetBuilder<DbController>(
+                      init: DbController(),
+                      initState: (_) {},
+                      builder: (_) {
+                        return fetchedPayments.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'No Payments yet!',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: fetchedPayments.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return statementBox(
+                                    height: height,
+                                    width: width,
+                                    amount: fetchedPayments[index]['Amount'],
+                                    date: fetchedPayments[index]['Time'],
+                                    liters: fetchedPayments[index]
+                                        ['TransactionID'],
+                                    tokens: fetchedPayments[index]['Tokens'],
+                                  );
+                                },
+                              );
                       },
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

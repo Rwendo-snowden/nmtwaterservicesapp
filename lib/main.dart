@@ -1,12 +1,17 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterwavepaymenttesting/pages/PAYBYPHONE.dart';
-import 'package:flutterwavepaymenttesting/pages/adminfolder/Adminpage.dart';
-import 'package:flutterwavepaymenttesting/pages/dashboardpage.dart';
-import 'package:flutterwavepaymenttesting/pages/paymentpage.dart';
 
+import 'package:flutterwavepaymenttesting/firebase_options.dart';
+import 'package:flutterwavepaymenttesting/pages/adminfolder/userRegistrationpage.dart';
+import 'package:flutterwavepaymenttesting/pages/dashboardpage.dart';
+import 'package:flutterwavepaymenttesting/pages/loginPage.dart';
 import 'package:get/get.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -16,12 +21,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'NMT water services ',
-      // home: MyHomePage('Flutterwave Standard'),
-      //home: Paymentpage(),
-      home: Paybyphone(),
-      //home: Tokenpage(),
-      // home: Dashboardpage(),
-      // home: AdminDashboard(),
+      home: LoginPage(),
+      // home: RegisterPage(),
+      //home: RegistrationPage(),
     );
   }
 }
