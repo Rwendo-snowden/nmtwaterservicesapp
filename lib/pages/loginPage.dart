@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutterwavepaymenttesting/Databases/firebaseAuthentication/Registration/loginModel.dart';
 import 'package:flutterwavepaymenttesting/pages/dashboardpage.dart';
@@ -83,9 +85,9 @@ class LoginPage extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () async {
                       final login = Loginmodel(
-                        name: emailcontroller.text,
-                        password: passwordcontroller.text,
-                      );
+                          email: emailcontroller.text,
+                          password: passwordcontroller.text,
+                          context: context);
                       login.Login();
                       //Get.to(() => Dashboardpage());
                       // await login.loginUser(

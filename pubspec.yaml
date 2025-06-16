@@ -39,7 +39,7 @@ dependencies:
   flutterwave_standard: ^1.0.7
   uuid: ^4.5.1
   get: ^4.6.6
-  
+  intl: ^0.18.1
   
   bluetooth_classic: ^0.0.2
   percent_indicator: ^4.2.4
@@ -48,7 +48,8 @@ dependencies:
   # firebase_core: ^3.13.0
   # firebase_database: ^11.3.5
   dart_azampay: ^0.0.4
-  telephony_sms: ^0.0.4
+  
+  
   sqflite: ^2.4.2
   path_provider: ^2.1.2
   encrypt: ^5.0.1
@@ -56,6 +57,13 @@ dependencies:
   firebase_auth: ^4.4.0
   cloud_firestore: ^4.0.0
   shared_preferences: ^2.2.2
+  easy_sms_receiver: ^0.0.2
+  permission_handler: ^12.0.0+1
+  telephony: ^0.2.0 
+  url_launcher: ^6.3.1
+  flutter_background_service: ^5.1.0
+  flutter_background_service_android: 
+  flutter_local_notifications: ^17.1.2 #
 dev_dependencies:
   flutter_test:
     sdk: flutter

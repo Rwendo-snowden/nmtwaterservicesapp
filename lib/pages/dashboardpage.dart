@@ -58,6 +58,7 @@ class _DashboardpageState extends State<Dashboardpage> {
   String Email = '';
   String Pnumber = '';
   String Uname = '';
+  String wBalance = '';
   @override
   void initState() {
     super.initState();
@@ -71,12 +72,15 @@ class _DashboardpageState extends State<Dashboardpage> {
     String? meterNo = prefs.getString('Meter_NO');
     String? Phonenumber = prefs.getString('Phonenumber');
     String? email = prefs.getString('email');
+    String? waterbalance =
+        prefs.getDouble('waterbalance').toString() ?? '0 liters';
 
     setState(() {
       meterNumber = meterNo ?? 'Unknown'; // or default fallback
       Pnumber = Phonenumber.toString();
       Email = email.toString();
       Uname = username.toString();
+      wBalance = waterbalance.toString();
     });
 
     if (username != null) {
@@ -140,9 +144,9 @@ class _DashboardpageState extends State<Dashboardpage> {
                     radius: width * 0.08,
                     child: IconButton(
                       onPressed: () async {
-                        //  sms.SendSms('45678238293892823');
+                        //sms.SendSms('45678238293892823');
 
-                        // var tk = await mn.CreateToken(1000);
+                        // var tk = await mn.CreateToken('2000');
                         // print('the tk is :$tk');
                       },
                       icon: Icon(Icons.person),
@@ -194,10 +198,26 @@ class _DashboardpageState extends State<Dashboardpage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text(
-                          '2000 lts',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.w300),
+                        InkWell(
+                          onTap: () async {
+                            _loadUserSession();
+                            if (meterNumber == "1") {
+                              await sms.SendSms('BALANCE A');
+
+                              _showMyDialog(context);
+                            } else if (meterNumber == "2") {
+                              await sms.SendSms('BALANCE B');
+                              _showMyDialog(context);
+                            } else if (meterNumber == "3") {
+                              await sms.SendSms('BALANCE C');
+                              _showMyDialog(context);
+                            }
+                          },
+                          child: Text(
+                            "$wBalance ltrs",
+                            style: TextStyle(
+                                fontSize: 25, fontWeight: FontWeight.w300),
+                          ),
                         ),
                         CircularPercentIndicator(
                           center: const Icon(
@@ -278,4 +298,24 @@ class _DashboardpageState extends State<Dashboardpage> {
       ),
     );
   }
+}
+
+void _showMyDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(""),
+        content: Text("balance requested successfully wait for sms shortly ! "),
+        actions: [
+          TextButton(
+            child: Text("Close"),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

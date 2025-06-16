@@ -6,6 +6,7 @@ import 'package:flutterwavepaymenttesting/Databases/Dbcontrollers/LocalDatabase.
 import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/paymentmanipulations.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
+import 'package:flutterwavepaymenttesting/pages/PAYBYPHONE.dart';
 import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
 import 'package:flutterwavepaymenttesting/wigdets/buttonUpdates.dart';
 import 'package:flutterwavepaymenttesting/wigdets/paymentpagewidgets/statementbox.dart';
@@ -201,6 +202,38 @@ class _PaymentpageState extends State<Paymentpage> {
           // ),
 
           SizedBox(
+            height: height * 0.02,
+          ),
+          InkWell(
+            onTap: () {
+              Get.to(() => Paybyphone());
+            },
+            child: Container(
+                height: height * 0.06,
+                width: width * 0.9,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 3,
+                      offset: const Offset(5, 5),
+                    ),
+                  ],
+                  color: Colors.red,
+                ),
+                child: Center(
+                  child: Text(
+                    'Pay by phone ',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )),
+          ),
+          SizedBox(
             height: height * 0.05,
           ),
 
@@ -261,7 +294,7 @@ class _PaymentpageState extends State<Paymentpage> {
                                     width: width,
                                     amount: fetchedPayments[index]['Amount'],
                                     date: fetchedPayments[index]['Time'],
-                                    liters: fetchedPayments[index]
+                                    TransactionId: fetchedPayments[index]
                                         ['TransactionID'],
                                     tokens: fetchedPayments[index]['Tokens'],
                                   );

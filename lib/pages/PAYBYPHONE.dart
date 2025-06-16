@@ -1,8 +1,10 @@
-import 'dart:convert';
-
-//import 'package:azampay/azampay.dart';
-import 'package:dart_azampay/dart_azampay.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_sms_receiver/easy_sms_receiver.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/paybyphonemodel.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Paybyphone extends StatefulWidget {
   const Paybyphone({super.key});
@@ -11,66 +13,197 @@ class Paybyphone extends StatefulWidget {
   State<Paybyphone> createState() => _PaybyphoneState();
 }
 
-// get these credentials from the azampay developers account
-// var azampay = AzamPay(
-//   appName: 'AIED',
-//   clientId: 'e526a508-9cc4-4509-87eb-3bfa6a1ef48e',
-//   clientSecret:
-//       'GLZNBgYJHSi3Tbueyhubv5Qz9CwvOT9btzV7O8Nh2NsRvP/XTfBFaPheQF6DrEYv10SRHNUdT45cCDREKHYvA781yLh2jDSlyHhv879mKHWxtP8WFxNrt49NqhS+MjALY/KfCz7ro9bdJZrpceO3zuoaPR2ZI4WdPZljDXj++yDKn9Anli/CTFwrf+ZcbmhHcjIWQOOo93ecYSoWUixtLFCiiZfPvNBGvhMtM+44SdCEZo3YFsX+LEGKo5uh4T5oQiCA5gMdmPx/pUElcU1xKJgx46lfmshMhAixUZig4I3sCESkqOopZcNyOC2FRRVoYu7YvV8KYPREMjWsX7HvZnR9Ij8qKpYtowj53ALeuk5WCQGmL6ouqJy68aF5pvwFs/8RPcaJzWPVpyqXefR9n2x9Bn2okdrarEkD63h33okb49Zca5ZG5zZx4r/onfx89490J8KxqilceSUHQs6jjtcfr5Cb5er1uSZwXcOYlUWVf+FTI0zy6hj0lQQXHbWJgcQ/ycMX+JCn+gsymjZT34Dz0OI5Mq0POBbYd6CIfKroNofuOEq/vDbGA0vUHgPF9eQ/egs8Ez4CqL0Z5tlccaJo64LDZ+pt52/a+VbaOsrsfOtTbCoSUD0HdfeRkvggZREx4KBh8bNnI9CFnOKLTO73j+y1ZUw1u8RRiGQTLjw=',
-// );
-
-// initialize the AzamPay client
-final azamPayClient = AzamPayClient(
-  appName: 'AIED',
-  clientId: 'e526a508-9cc4-4509-87eb-3bfa6a1ef48e',
-  clientSecret:
-      'GLZNBgYJHSi3Tbueyhubv5Qz9CwvOT9btzV7O8Nh2NsRvP/XTfBFaPheQF6DrEYv10SRHNUdT45cCDREKHYvA781yLh2jDSlyHhv879mKHWxtP8WFxNrt49NqhS+MjALY/KfCz7ro9bdJZrpceO3zuoaPR2ZI4WdPZljDXj++yDKn9Anli/CTFwrf+ZcbmhHcjIWQOOo93ecYSoWUixtLFCiiZfPvNBGvhMtM+44SdCEZo3YFsX+LEGKo5uh4T5oQiCA5gMdmPx/pUElcU1xKJgx46lfmshMhAixUZig4I3sCESkqOopZcNyOC2FRRVoYu7YvV8KYPREMjWsX7HvZnR9Ij8qKpYtowj53ALeuk5WCQGmL6ouqJy68aF5pvwFs/8RPcaJzWPVpyqXefR9n2x9Bn2okdrarEkD63h33okb49Zca5ZG5zZx4r/onfx89490J8KxqilceSUHQs6jjtcfr5Cb5er1uSZwXcOYlUWVf+FTI0zy6hj0lQQXHbWJgcQ/ycMX+JCn+gsymjZT34Dz0OI5Mq0POBbYd6CIfKroNofuOEq/vDbGA0vUHgPF9eQ/egs8Ez4CqL0Z5tlccaJo64LDZ+pt52/a+VbaOsrsfOtTbCoSUD0HdfeRkvggZREx4KBh8bNnI9CFnOKLTO73j+y1ZUw1u8RRiGQTLjw=',
-  sandbox: true, // set to false for production
-);
-
 class _PaybyphoneState extends State<Paybyphone> {
+  final EasySmsReceiver _smsReceiver = EasySmsReceiver.instance;
+  final Smscontroller sms = Smscontroller();
+
+  String _receiverStatus = "Idle";
+  SmsDetails _latestSmsDetails = SmsDetails(originalMessage: "No message yet.");
+
+  String? lastProcessedTransactionId;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _launchUssdCode(String ussdCode) async {
+    final Uri url = Uri(scheme: 'tel', path: ussdCode);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      _showDialog("Error",
+          "Could not launch USSD code. Please ensure your device supports dialing.");
+    }
+  }
+
+  Future<bool> _requestSmsPermission() async {
+    final PermissionStatus status = await Permission.sms.request();
+    if (status.isPermanentlyDenied) {
+      _showDialog("Permission Denied",
+          "SMS permission is permanently denied. Please enable it from app settings.");
+      openAppSettings();
+      return false;
+    }
+    return status.isGranted;
+  }
+
+  Future<void> _startSmsReceiver() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (await _requestSmsPermission()) {
+      _smsReceiver.listenIncomingSms(
+        onNewMessage: (message) {
+          if (!mounted) return;
+
+          debugPrint("📥 New SMS received from: ${message.address}");
+          debugPrint("📄 Message body: ${message.body}");
+
+          final details = SmsDetails.fromMessage(message.body ?? "");
+          final String? currentTransactionId = details.transactionId;
+
+          // Prevent duplicate processing
+          if (currentTransactionId != null &&
+              currentTransactionId == lastProcessedTransactionId) {
+            debugPrint("⚠️ Duplicate transaction ID detected. Ignoring.");
+            return;
+          }
+          lastProcessedTransactionId = currentTransactionId;
+
+          setState(() {
+            _latestSmsDetails = details;
+          });
+
+          // Get meter number from SharedPreferences
+          final String meterNo =
+              prefs.getString('Meter_NO') ?? 'No meter number';
+          final double amount =
+              double.tryParse(details.amountPaid ?? "0") ?? 0.0;
+          final double liters = amount / 100;
+
+          final isValidSender =
+              message.address == "HaloPesa" || message.address == "M-PESA";
+          final isValidRecipient =
+              details.recipientName == 'MELTRIDES MZEE RWEYENDERA';
+
+          if (isValidRecipient && isValidSender) {
+            switch (meterNo) {
+              case "1":
+                sms.SendSms('A:$liters,B:0,C:0');
+                break;
+              case "2":
+                sms.SendSms('A:0,B:$liters,C:0');
+                break;
+              case "3":
+                sms.SendSms('A:0,B:0,C:$liters');
+                break;
+              default:
+                debugPrint("❌ Unknown meter number: $meterNo");
+            }
+
+            debugPrint("📤 Response SMS sent based on meter $meterNo.");
+          }
+        },
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _receiverStatus = "Running";
+      });
+    } else {
+      if (!mounted) return;
+      setState(() {
+        _receiverStatus = "Permission Denied";
+      });
+    }
+  }
+
+  void _stopSmsReceiver() {
+    _smsReceiver.stopListenIncomingSms();
+    if (!mounted) return;
+    setState(() {
+      _receiverStatus = "Stopped";
+    });
+  }
+
+  void _showDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () async {
-              print('Rwendokiba');
-              // var mobileResponse = await azampay.mobileCheckout(
-              //     merchantMobileNumber: "0613311958",
-              //     amount: "1000",
-              //     currency: "TZS",
-              //     provider:
-              //         "Halopesa", // ["Airtel" "Tigo" "Halopesa" "Azampesa"]
-              //     externalId: "12",
-              //     additionalProperties: {});
-
-              // print(json.decode(mobileResponse.body));
-
-              // create an instance of the Checkout service
-              final checkoutService = Checkout(azamPayClient);
-
-// Create a MNOCheckoutRequest
-              final mnoRequest = MnoCheckoutRequest(
-                accountNumber: '255747597935',
-                additionalProperties: {}, //optional
-                amount: '1000',
-                currency: 'TZS',
-                externalId: '12323',
-                provider: MnoProvider.mpesa, // or any other provider
-              );
-
-// Example usage of the checkout service
-              final res = await checkoutService.mnoPayment(request: mnoRequest);
-              print('mno checkout response: ${res.data}');
-
-// successful mobile checkout response (you can now see a push USSD on your phone)
-            },
-            child: Text('Pay'),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 230, 227, 227),
+        appBar: AppBar(
+          title: const Text('Pay by Phone'),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Payment RxT : $_receiverStatus',
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton.icon(
+                onPressed: () {
+                  _startSmsReceiver();
+                  _launchUssdCode("*150*00#");
+                },
+                icon: const Icon(Icons.phone_android),
+                label: const Text('Pay by M-Pesa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 15),
+              ElevatedButton.icon(
+                onPressed: () {
+                  _startSmsReceiver();
+                  _launchUssdCode("*150*88#");
+                },
+                icon: const Icon(Icons.phone_android),
+                label: const Text('Pay by HaloPesa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterwavepaymenttesting/datamanipulation/bluetoothServices.dart';
+import 'package:flutterwavepaymenttesting/datamanipulation/smscontroller.dart';
 import 'package:flutterwavepaymenttesting/wigdets/Appbar.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +22,9 @@ class _TokenpageState extends State<Tokenpage> {
   //
   final Bluetoothservices bluetoothservices = Get.put(Bluetoothservices());
   final _bluetoothClassicPlugin = BluetoothClassic();
+  final sms = Smscontroller();
   //
+
   @override
   Widget build(BuildContext context) {
     return
@@ -58,7 +61,8 @@ class _TokenpageState extends State<Tokenpage> {
                       _Tokenformkey.currentState!.save();
                       // check if device is connceted to bluetooth ; if its connected then send the tokens
                       try {
-                        await _bluetoothClassicPlugin.write(Token);
+                        // await _bluetoothClassicPlugin.write(Token);
+                        sms.SendSms(Token);
                       } catch (e) {
                         print(e);
                         print('The meter is not connected ');

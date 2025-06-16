@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutterwavepaymenttesting/pages/TransactionDetails.dart';
+import 'package:get/get.dart';
+import 'package:get/utils.dart';
 
 class statementBox extends StatelessWidget {
   const statementBox({
@@ -7,7 +10,7 @@ class statementBox extends StatelessWidget {
     required this.width,
     required this.amount,
     required this.date,
-    required this.liters,
+    required this.TransactionId,
     required this.tokens,
   });
 
@@ -15,7 +18,7 @@ class statementBox extends StatelessWidget {
   final double width;
   final amount;
   final date;
-  final liters;
+  final TransactionId;
   final tokens;
 
   @override
@@ -24,7 +27,13 @@ class statementBox extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Get.to(() => TransactionDetailsPage(
+                  TransactionDate: date,
+                  amount: amount,
+                  token: tokens,
+                  transactionId: TransactionId));
+            },
             child: Container(
               height: height * 0.11,
               width: width * 0.9,

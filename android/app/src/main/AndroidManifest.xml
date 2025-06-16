@@ -1,6 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.SEND_SMS" />
-    
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/> <!-- Required for Android 13 (API 33) and above -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> <!-- If you use autoStartOnBoot: true -->
+  <!--
+    Permission to use here depends on the value you picked for foregroundServiceType - see the Android documentation.
+    Eg, if you picked 'location', use 'android.permission.FOREGROUND_SERVICE_LOCATION'
+  -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_..." />
+       <queries>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+    </queries>
+
     <application
         android:label="NMT WATER SUPPLY"
         android:name="${applicationName}"
@@ -32,6 +48,20 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+    <!-- Service for flutter_background_service -->
+         <service
+        android:name="id.flutter.flutter_background_service.BackgroundService"
+        android:foregroundServiceType="phoneCall|dataSync"
+        android:enabled="true"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="id.flutter.flutter_background_service.ACTION_STOP" />
+        </intent-filter>
+    </service>
+        <!-- END Service for flutter_background_service -->
+
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

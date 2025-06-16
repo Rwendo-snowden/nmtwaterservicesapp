@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bluetooth_classic/bluetooth_classic.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
 import 'package:flutterwave_standard/core/flutterwave.dart';
 import 'package:flutterwave_standard/models/requests/customer.dart';
@@ -13,6 +14,7 @@ import 'package:flutterwavepaymenttesting/datamanipulation/tokenmanipulation.dar
 import 'package:flutterwavepaymenttesting/wigdets/buttonUpdates.dart';
 
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class PaymentManipulation {
@@ -37,6 +39,7 @@ class PaymentManipulation {
   final Tokenmanipulation tokenmanipulation = Tokenmanipulation();
 
   var tokenRequied = '';
+  var generatedtoken = '';
 
   //creating sms intance
   final Smscontroller sms = Smscontroller();
@@ -51,6 +54,8 @@ class PaymentManipulation {
   // instance of the local database controller
 
   final DbController LocalDB = Get.put(DbController());
+
+  //
 
   // payment handling by flutterwave
   var responseTxf = '';
@@ -132,16 +137,36 @@ class PaymentManipulation {
         sendBlueTOKENS();
       } else {
         int am = int.parse(amount);
-        double literObtained = am / 1000;
+        double literObtained = am / 100;
         tokenRequied = literObtained.toString();
         // await _bluetoothClassicPlugin.write(literObtained.toString());
         //await sms.SendSms('A:0,B:$tokenRequied,C:0');
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        //calculate the waterbalance here !
+        double waterbalance;
+        waterbalance = (prefs.getDouble('waterbalance') ?? 0.0) + literObtained;
+
+        //
+        prefs.setDouble('waterbalance', waterbalance);
+        //
+        // token calculation is here
+
         if (meterNo == "1") {
           await sms.SendSms('A:$tokenRequied,B:0,C:0');
+
+          generatedtoken =
+              await tokenmanipulation.CreateToken('A:$tokenRequied,B:0,C:0');
+
+          // await sms.SendSms(generatedtoken);
+          // Encrypt
         } else if (meterNo == "2") {
           await sms.SendSms('A:0,B:$tokenRequied,C:0');
+          generatedtoken =
+              await tokenmanipulation.CreateToken('A:0,B:$tokenRequied,C:0');
         } else if (meterNo == "3") {
           await sms.SendSms('A:0,B:0,C:$tokenRequied');
+          generatedtoken =
+              await tokenmanipulation.CreateToken('A:0,B:0,C:$tokenRequied');
         }
 
         print(" the liters sent by sms are: $literObtained");
@@ -149,7 +174,7 @@ class PaymentManipulation {
       }
       // save the Transaction details in the local database here
       Map<String, dynamic> payments = {
-        'Tokens': tokenRequied,
+        'Tokens': generatedtoken,
         'TransactionID': responseTxf,
         'Amount': amount,
         'Liters': 25,
